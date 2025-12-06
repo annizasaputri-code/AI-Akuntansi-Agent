@@ -2,7 +2,6 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 from langchain_groq import ChatGroq
-from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
 # Load API Key
