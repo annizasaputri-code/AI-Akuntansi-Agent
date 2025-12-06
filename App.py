@@ -1,20 +1,37 @@
 import streamlit as st
-from langchain_groq import ChatGroq
-from langchain.chains import ConversationChain
 from dotenv import load_dotenv
 import os
+from langchain_groq import ChatGroq
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
 
+# Load API Key
 load_dotenv()
 api_key = os.getenv("GROQ_API_KEY")
 
+# Model
 model = ChatGroq(api_key=api_key, model_name="llama-3.1-70b-versatile")
-conversation = ConversationChain(llm=model)
 
-st.title("🤖 AI Agent Akuntansi")
-st.write("Tanya tentang jurnal, laporan keuangan, rasio, SAP/PSAK, dan lainnya 💬✨")
+# Prompt (biar AI fokus akuntansi)
+prompt = PromptTemplate(
+    input_variables=["question"],
+    template="""
+Kamu adalah AI yang ahli dalam akuntansi, terutama PSAK, SAP, jurnal, laporan keuangan, analisis rasio, akuntansi pemerintahan, dan perpajakan.
 
-user_input = st.text_input("Tanyakan sesuatu:")
+Jawab dengan jelas, sederhana, dan contoh jika perlu.
 
-if user_input:
-    response = conversation.predict(input=user_input)
-    st.success(response)
+Pertanyaan user: {question}
+"""
+)
+
+chain = LLMChain(llm=model, prompt=prompt)
+
+# UI Streamlit
+st.title("📊 AI Accounting Assistant")
+st.write("Silakan tanya tentang akuntansi apa pun ✨")
+
+question = st.text_input("Masukkan pertanyaan:")
+
+if question:
+    answer = chain.run(question)
+    st.success(answer)
